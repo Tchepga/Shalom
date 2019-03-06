@@ -1,63 +1,64 @@
-import 'package:beautiful_list/model/lesson.dart';
+import 'package:beautiful_list/model/clients.dart';
 import 'package:flutter/material.dart';
 
-class DetailPage extends StatelessWidget {
-  final Lesson lesson;
-  DetailPage({Key key, this.lesson}) : super(key: key);
+class DetailClient extends StatelessWidget {
+  final Clients client;
+  DetailClient({Key key, this.client}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    final levelIndicator = Container(
-      child: Container(
-        child: LinearProgressIndicator(
-            backgroundColor: Color.fromRGBO(209, 224, 224, 0.2),
-            value: lesson.indicatorValue,
-            valueColor: AlwaysStoppedAnimation(Colors.green)),
-      ),
-    );
+    final textModel = Text(
+          client.model,
+          style: TextStyle(color: Colors.white, fontSize: 10.0),
+        );
 
-    final coursePrice = Container(
+    final montantClient = Container(
       padding: const EdgeInsets.all(7.0),
+      margin: const EdgeInsets.all(7.0),
       decoration: new BoxDecoration(
-          border: new Border.all(color: Colors.white),
+          border: new Border.all(color: Colors.black87),
           borderRadius: BorderRadius.circular(5.0)),
       child: new Text(
-        "\$" + lesson.price.toString(),
-        style: TextStyle(color: Colors.white),
+         "Montant facture : "+client.montant.toString()+"\€",
+        style: TextStyle(color: Colors.red),
       ),
     );
 
     final topContentText = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        SizedBox(height: 120.0),
+        SizedBox(height: 100.0),
         Icon(
           Icons.directions_car,
           color: Colors.white,
           size: 40.0,
         ),
+        Text(
+          client.isSuspect? "Signalé comme suspect":"Rien à signaler",
+          style: TextStyle(color: client.isSuspect? Colors.red:Colors.white, fontSize: 20.0),
+          ),
         Container(
           width: 90.0,
           child: new Divider(color: Colors.green),
         ),
         SizedBox(height: 10.0),
         Text(
-          lesson.title,
+          client.immatriculation,
           style: TextStyle(color: Colors.white, fontSize: 45.0),
         ),
         SizedBox(height: 30.0),
         Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
-            Expanded(flex: 1, child: levelIndicator),
-            Expanded(
+            Expanded(flex: 1, child: textModel),
+            /*Expanded(
                 flex: 6,
                 child: Padding(
                     padding: EdgeInsets.only(left: 10.0),
                     child: Text(
-                      lesson.level,
+                      client.immatriculation,
                       style: TextStyle(color: Colors.white),
                     ))),
-            Expanded(flex: 1, child: coursePrice)
+            Expanded(flex: 1, child: montantClient)*/
           ],
         ),
       ],
@@ -96,25 +97,47 @@ class DetailPage extends StatelessWidget {
       ],
     );
 
-    final bottomContentText = Text(
-      lesson.content,
+    final adressText = Text(
+      client.adress,
       style: TextStyle(fontSize: 18.0),
+    );
+    final nameClient = Text(
+      client.name,
+      style: TextStyle(fontSize: 20.0),
+    );
+    final noteContent = Container(
+     // width: MediaQuery.of(context).size.width,
+      padding: EdgeInsets.all(10.0),
+      child: Center(
+        child: Column(
+          children: <Widget>[
+            Text(
+                  "Remarque : ",
+                  style: TextStyle(fontSize: 25.0),
+                ),
+            Text(
+                  client.note,
+                  style: TextStyle(fontSize: 18.0),
+                ),
+            ],
+        ),
+      ),
     );
     final readButton = Container(
         padding: EdgeInsets.symmetric(vertical: 16.0),
         width: MediaQuery.of(context).size.width,
         child: RaisedButton(
           onPressed: () => {},
-          color: Color.fromRGBO(58, 66, 86, 1.0),
+          color: Color.fromRGBO(0, 66, 0, 0.5),
           child:
-              Text("TAKE THIS LESSON", style: TextStyle(color: Colors.white)),
+              Text("Supprimer ce compte", style: TextStyle(color: Colors.white)),
         ));
     final bottomContent = Container(
       width: MediaQuery.of(context).size.width,
       padding: EdgeInsets.all(40.0),
       child: Center(
         child: Column(
-          children: <Widget>[bottomContentText, readButton],
+          children: <Widget>[nameClient,adressText,montantClient,noteContent, readButton],
         ),
       ),
     );

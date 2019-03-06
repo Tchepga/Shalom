@@ -1,6 +1,6 @@
-# beautiful_list
+# Grivelerie app
 
-A new Flutter project.
+A manage grivelerie of shalom's client.
 
 ## Getting Started
 
@@ -14,7 +14,7 @@ View tutorial online
 
 ```dart
 
-cd beautiful-list
+cd shalomV1
 flutter packages get
 open -a simulator
 flutter run
