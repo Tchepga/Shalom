@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:beautiful_list/detail_client.dart';
-import 'package:beautiful_list/model/clients.dart';
-import 'package:beautiful_list/client_form.dart';
+import 'package:shalomV1/detail_client.dart';
+import 'package:shalomV1/model/clients.dart';
+import 'package:shalomV1/client_form.dart';
+import 'package:shalomV1/model/manageData.dart';
 
 void main() => runApp(new MyApp());
 
@@ -55,8 +56,9 @@ class _ListPageState extends State<ListPage> {
   );
   @override
   void initState() {
-    clients = getClients();
-    searchResult = getClients();
+    //clients = getClients() as List;
+    //searchResult = getClients() as List;
+    //getClients();
     super.initState();
   }
 
@@ -73,7 +75,7 @@ class _ListPageState extends State<ListPage> {
             child: Icon(Icons.perm_identity, color: Colors.white),
           ),
           title: Text(
-            client.immatriculation,
+            client.immatriculation==null?'XX XXX XX':client.immatriculation,
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
           ),
           // subtitle: Text("Intermediate", style: TextStyle(color: Colors.white)),
@@ -85,7 +87,7 @@ class _ListPageState extends State<ListPage> {
                   child: Container(
                       // tag: 'hero',
                       child: Text(
-                    client.montant.toString() + "€",
+                    client.montant==null?'XX €':  client.montant.toString()+ "€",
                     textAlign: TextAlign.center,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
@@ -96,7 +98,7 @@ class _ListPageState extends State<ListPage> {
                 flex: 4,
                 child: Padding(
                     padding: EdgeInsets.only(left: 10.0),
-                    child: Text(client.name,
+                    child: Text(client.model==null?'XXXXXXX':client.model,
                         style: TextStyle(color: Colors.white))),
               )
             ],
@@ -120,17 +122,23 @@ class _ListPageState extends State<ListPage> {
           ),
         );
 
-    final makeBody = Container(
-      // decoration: BoxDecoration(color: Color.fromRGBO(58, 66, 86, 1.0)),
-      child: ListView.builder(
-        scrollDirection: Axis.vertical,
-        shrinkWrap: true,
-        itemCount: searchResult.length,
-        itemBuilder: (BuildContext context, int index) {
-          return makeCard(searchResult[index]);
-        },
-      ),
-    );
+    final makeBody = FutureBuilder<List<Clients>>(
+        // decoration: BoxDecoration(color: Color.fromRGBO(58, 66, 86, 1.0)),
+        future: ManageData.db.getClients(),
+        builder: (BuildContext context, AsyncSnapshot<List<Clients>> snapshot) {
+          if (snapshot.hasData && !snapshot.hasError) {
+            return ListView.builder(
+                scrollDirection: Axis.vertical,
+                shrinkWrap: true,
+                itemCount: snapshot.data.length,
+                itemBuilder: (BuildContext context, int index) {
+                 Clients item=snapshot.data[index];
+                  return makeCard(item);
+                });
+          } else {
+            return Center(child: CircularProgressIndicator());
+          }
+        });
 
     final makeBottom = Container(
       height: 55.0,
@@ -146,10 +154,8 @@ class _ListPageState extends State<ListPage> {
             IconButton(
               icon: Icon(Icons.person_add, color: Colors.white),
               onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => FormClient()));
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => FormClient()));
               },
             ),
             IconButton(
@@ -199,8 +205,8 @@ class _ListPageState extends State<ListPage> {
   }
 }
 
-List getClients() {
-  return [
+/*getClients() {
+  List<Clients> defaultValue = [
     Clients(
       immatriculation: "CP 405 RT",
       name: "Patrick Tchepga",
@@ -256,4 +262,11 @@ List getClients() {
       isSuspect: false,
     ),
   ];
-}
+  ManageData.db.insertClient(defaultValue[0]);
+  ManageData.db.insertClient(defaultValue[1]);
+  ManageData.db.insertClient(defaultValue[2]);
+
+  List<Clients> result = await ManageData.db.getClients();
+  print(result);
+  return result != null ? result : defaultValue;
+}*/

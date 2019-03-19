@@ -1,4 +1,4 @@
-import 'package:beautiful_list/model/clients.dart';
+import 'package:shalomV1/model/clients.dart';
 import 'package:flutter/material.dart';
 
 class DetailClient extends StatelessWidget {
@@ -7,7 +7,7 @@ class DetailClient extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textModel = Text(
-          client.model,
+          client.model==null?'XXXX':client.model,
           style: TextStyle(color: Colors.white, fontSize: 10.0),
         );
 
@@ -18,7 +18,7 @@ class DetailClient extends StatelessWidget {
           border: new Border.all(color: Colors.black87),
           borderRadius: BorderRadius.circular(5.0)),
       child: new Text(
-         "Montant facture : "+client.montant.toString()+"\€",
+         "Montant facture : "+client.montant.toString()==null?'XXXXX':client.montant.toString()+"\€",
         style: TextStyle(color: Colors.red),
       ),
     );
@@ -33,7 +33,7 @@ class DetailClient extends StatelessWidget {
           size: 40.0,
         ),
         Text(
-          client.isSuspect? "Signalé comme suspect":"Rien à signaler",
+          client.isSuspect||client.isSuspect==null? "Signalé comme suspect":"Rien à signaler",
           style: TextStyle(color: client.isSuspect? Colors.red:Colors.white, fontSize: 20.0),
           ),
         Container(
@@ -42,7 +42,7 @@ class DetailClient extends StatelessWidget {
         ),
         SizedBox(height: 10.0),
         Text(
-          client.immatriculation,
+          client.immatriculation==null?'XX XXX XX':client.immatriculation,
           style: TextStyle(color: Colors.white, fontSize: 45.0),
         ),
         SizedBox(height: 30.0),
@@ -98,11 +98,11 @@ class DetailClient extends StatelessWidget {
     );
 
     final adressText = Text(
-      client.adress,
+      client.adress==null?'XXXX':client.adress,
       style: TextStyle(fontSize: 18.0),
     );
     final nameClient = Text(
-      client.name,
+      client.name==null?'XXXX':client.name,
       style: TextStyle(fontSize: 20.0),
     );
     final noteContent = Container(
@@ -116,7 +116,7 @@ class DetailClient extends StatelessWidget {
                   style: TextStyle(fontSize: 25.0),
                 ),
             Text(
-                  client.note,
+                  client.note==null?'XXXX':client.note,
                   style: TextStyle(fontSize: 18.0),
                 ),
             ],
