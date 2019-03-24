@@ -65,6 +65,7 @@ class ManageData {
         immatriculation: maps[i]['immatriculation'],
         adress: maps[i]['adress'],
         model: maps[i]['model'],
+        name: maps[i]['name'],
         montant: maps[i]['montant'],
         note: maps[i]['note'],
         isSuspect: maps[i]['isSuspect'] == 1 ? true : false,

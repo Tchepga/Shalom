@@ -1,5 +1,6 @@
 import 'package:shalomV1/model/clients.dart';
 import 'package:flutter/material.dart';
+import 'package:shalomV1/model/manageData.dart';
 
 class DetailClient extends StatelessWidget {
   final Clients client;
@@ -7,9 +8,9 @@ class DetailClient extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textModel = Text(
-          client.model==null?'XXXX':client.model,
-          style: TextStyle(color: Colors.white, fontSize: 10.0),
-        );
+      client.model == null ? 'XXXX' : client.model,
+      style: TextStyle(color: Colors.white, fontSize: 10.0),
+    );
 
     final montantClient = Container(
       padding: const EdgeInsets.all(7.0),
@@ -18,7 +19,9 @@ class DetailClient extends StatelessWidget {
           border: new Border.all(color: Colors.black87),
           borderRadius: BorderRadius.circular(5.0)),
       child: new Text(
-         "Montant facture : "+client.montant.toString()==null?'XXXXX':client.montant.toString()+"\€",
+        "Montant facture : " + client.montant.toString() == null
+            ? 'XXXXX'
+            : client.montant.toString() + "\€",
         style: TextStyle(color: Colors.red),
       ),
     );
@@ -33,16 +36,20 @@ class DetailClient extends StatelessWidget {
           size: 40.0,
         ),
         Text(
-          client.isSuspect||client.isSuspect==null? "Signalé comme suspect":"Rien à signaler",
-          style: TextStyle(color: client.isSuspect? Colors.red:Colors.white, fontSize: 20.0),
-          ),
+          client.isSuspect || client.isSuspect == null
+              ? "Signalé comme suspect"
+              : "Rien à signaler",
+          style: TextStyle(
+              color: client.isSuspect ? Colors.red : Colors.white,
+              fontSize: 20.0),
+        ),
         Container(
           width: 90.0,
           child: new Divider(color: Colors.green),
         ),
         SizedBox(height: 10.0),
         Text(
-          client.immatriculation==null?'XX XXX XX':client.immatriculation,
+          client.immatriculation == null ? 'XX XXX XX' : client.immatriculation,
           style: TextStyle(color: Colors.white, fontSize: 45.0),
         ),
         SizedBox(height: 30.0),
@@ -98,46 +105,82 @@ class DetailClient extends StatelessWidget {
     );
 
     final adressText = Text(
-      client.adress==null?'XXXX':client.adress,
+      client.adress == null ? 'XXXX' : client.adress,
       style: TextStyle(fontSize: 18.0),
     );
     final nameClient = Text(
-      client.name==null?'XXXX':client.name,
+      client.name == null ? 'XXXX' : client.name,
       style: TextStyle(fontSize: 20.0),
     );
     final noteContent = Container(
-     // width: MediaQuery.of(context).size.width,
+      // width: MediaQuery.of(context).size.width,
       padding: EdgeInsets.all(10.0),
       child: Center(
         child: Column(
           children: <Widget>[
             Text(
-                  "Remarque : ",
-                  style: TextStyle(fontSize: 25.0),
-                ),
+              "Remarque : ",
+              style: TextStyle(fontSize: 25.0),
+            ),
             Text(
-                  client.note==null?'XXXX':client.note,
-                  style: TextStyle(fontSize: 18.0),
-                ),
-            ],
+              client.note == null ? 'XXXX' : client.note,
+              style: TextStyle(fontSize: 18.0),
+            ),
+          ],
         ),
       ),
     );
-    final readButton = Container(
+    final deleteButton = Container(
         padding: EdgeInsets.symmetric(vertical: 16.0),
         width: MediaQuery.of(context).size.width,
         child: RaisedButton(
-          onPressed: () => {},
+          onPressed: () => {
+                showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: Text(
+                          "Confirmation of delete",
+                          style: TextStyle(fontSize: 21.0, color: Colors.red),
+                        ),
+                        content: Text('Would you want to delete data of ' +
+                            client.immatriculation +
+                            ' ?'),
+                        actions: <Widget>[
+                          FlatButton(
+                            child: Text('Cancel'),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                          FlatButton(
+                            child: new Text("Accept"),
+                            onPressed: () {
+                              ManageData.db.deleteClient(client.immatriculation);
+                              Navigator.pop(context);
+                              Navigator.pop(context);
+                            },
+                          )
+                        ],
+                      );
+                    })
+              },
           color: Color.fromRGBO(0, 66, 0, 0.5),
-          child:
-              Text("Supprimer ce compte", style: TextStyle(color: Colors.white)),
+          child: Text("Supprimer ce compte",
+              style: TextStyle(color: Colors.white)),
         ));
     final bottomContent = Container(
       width: MediaQuery.of(context).size.width,
       padding: EdgeInsets.all(40.0),
       child: Center(
         child: Column(
-          children: <Widget>[nameClient,adressText,montantClient,noteContent, readButton],
+          children: <Widget>[
+            nameClient,
+            adressText,
+            montantClient,
+            noteContent,
+            deleteButton
+          ],
         ),
       ),
     );

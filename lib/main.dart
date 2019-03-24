@@ -30,10 +30,11 @@ class ListPage extends StatefulWidget {
 }
 
 class _ListPageState extends State<ListPage> {
-  static List clients;
-  static List searchResult;
+  static Future<List<Clients>> clients;
+  static List<Clients> dataClients= new List();
+  static List<Clients> searchResult=new List();
   static final TextEditingController _controller = new TextEditingController();
-  static bool _isSearching;
+  static bool _isSearching=false;
   static String _searchText = "";
 
   Icon searchIcon = new Icon(Icons.search);
@@ -42,23 +43,29 @@ class _ListPageState extends State<ListPage> {
     decoration: InputDecoration(
         prefixIcon: Icon(Icons.search), hintText: "Rechercher..."),
     onChanged: (String searchText) {
-      searchResult.clear();
-
-      for (int i = 0; i < clients.length; i++) {
-        Clients data = clients[i];
+      if(searchResult!=null)searchResult.clear();
+      print(dataClients.length);
+      _searchText = searchText;
+      for (int i = 0; i < dataClients.length; i++) {
+        Clients data = dataClients[i];
         if (data.immatriculation
             .toLowerCase()
             .contains(searchText.toLowerCase())) {
           searchResult.add(data);
         }
       }
+      _isSearching=true;
+      if(searchText==null) _isSearching=false;
+      print(searchResult.length);
     },
   );
   @override
   void initState() {
-    //clients = getClients() as List;
-    //searchResult = getClients() as List;
-    //getClients();
+    clients = ManageData.db.getClients();
+    dataClients =new List();
+    clients.then((value) => {
+      value.isNotEmpty?value.forEach((f)=>{dataClients.add(f)}) : print("Warning: Null value of client")
+      });
     super.initState();
   }
 
@@ -75,7 +82,9 @@ class _ListPageState extends State<ListPage> {
             child: Icon(Icons.perm_identity, color: Colors.white),
           ),
           title: Text(
-            client.immatriculation==null?'XX XXX XX':client.immatriculation,
+            client.immatriculation == null
+                ? 'XX XXX XX'
+                : client.immatriculation,
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
           ),
           // subtitle: Text("Intermediate", style: TextStyle(color: Colors.white)),
@@ -87,7 +96,9 @@ class _ListPageState extends State<ListPage> {
                   child: Container(
                       // tag: 'hero',
                       child: Text(
-                    client.montant==null?'XX €':  client.montant.toString()+ "€",
+                    client.montant == null
+                        ? 'XX €'
+                        : client.montant.toString() + "€",
                     textAlign: TextAlign.center,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
@@ -98,7 +109,7 @@ class _ListPageState extends State<ListPage> {
                 flex: 4,
                 child: Padding(
                     padding: EdgeInsets.only(left: 10.0),
-                    child: Text(client.model==null?'XXXXXXX':client.model,
+                    child: Text(client.model == null ? 'XXXXXXX' : client.model,
                         style: TextStyle(color: Colors.white))),
               )
             ],
@@ -124,7 +135,7 @@ class _ListPageState extends State<ListPage> {
 
     final makeBody = FutureBuilder<List<Clients>>(
         // decoration: BoxDecoration(color: Color.fromRGBO(58, 66, 86, 1.0)),
-        future: ManageData.db.getClients(),
+        future: clients,
         builder: (BuildContext context, AsyncSnapshot<List<Clients>> snapshot) {
           if (snapshot.hasData && !snapshot.hasError) {
             return ListView.builder(
@@ -132,12 +143,30 @@ class _ListPageState extends State<ListPage> {
                 shrinkWrap: true,
                 itemCount: snapshot.data.length,
                 itemBuilder: (BuildContext context, int index) {
-                 Clients item=snapshot.data[index];
-                  return makeCard(item);
+                  Clients item = snapshot.data[index];
+                  if (item.immatriculation
+                      .toLowerCase()
+                      .contains(_searchText.toLowerCase()))
+                    return makeCard(item);
                 });
           } else {
             return Center(child: CircularProgressIndicator());
           }
+        });
+    final resultBody = ListView.builder(
+        scrollDirection: Axis.vertical,
+        shrinkWrap: true,
+        itemCount:searchResult==null?0: searchResult.length,
+        itemBuilder: (BuildContext context, int index) {
+            Clients item;
+          if(searchResult!=null)
+            item= searchResult[index];
+          else 
+            item=dataClients[index];
+
+          if (item.immatriculation
+              .toLowerCase()
+              .contains(_searchText.toLowerCase())) return makeCard(item);
         });
 
     final makeBottom = Container(
@@ -149,7 +178,14 @@ class _ListPageState extends State<ListPage> {
           children: <Widget>[
             IconButton(
               icon: Icon(Icons.home, color: Colors.white),
-              onPressed: () {},
+              onPressed: () {
+               setState(() {
+                clients =ManageData.db.getClients(); 
+                clients.then((value) => {
+                    value.isNotEmpty?value.forEach((f)=>{dataClients.add(f)}) : print("Warning: Null value of client")
+                });
+               });
+              },
             ),
             IconButton(
               icon: Icon(Icons.person_add, color: Colors.white),
@@ -159,11 +195,11 @@ class _ListPageState extends State<ListPage> {
               },
             ),
             IconButton(
-              icon: Icon(Icons.hotel, color: Colors.white),
+              icon: Icon(Icons.block, color: Colors.white),
               onPressed: () {},
             ),
             IconButton(
-              icon: Icon(Icons.account_box, color: Colors.white),
+              icon: Icon(Icons.build, color: Colors.white),
               onPressed: () {},
             )
           ],
@@ -199,7 +235,7 @@ class _ListPageState extends State<ListPage> {
     return Scaffold(
       backgroundColor: Color.fromRGBO(58, 66, 86, 1.0),
       appBar: topAppBar,
-      body: makeBody,
+      body: _isSearching?resultBody:makeBody,
       bottomNavigationBar: makeBottom,
     );
   }

@@ -139,7 +139,7 @@ class FormClientFull extends State<FormClient> {
   }
 
   String validationIM(String value) {
-    String patttern = r'(^[a-zA-Z ]*$)';
+    String patttern = r'(^[a-zA-Z0-9 ]*$)';
     RegExp regExp = new RegExp(patttern);
     if (value.isEmpty) {
       return "Immatriculation is Required";
@@ -178,14 +178,7 @@ class FormClientFull extends State<FormClient> {
   }
 
   _sendToServer() {
-    /* Clients client = new Clients(
-        adress: "mon_ad",
-        immatriculation: "imma",
-        isSuspect: false,
-        model: "model",
-        montant: 20.5,
-        name: "name",
-        note: "note");*/
+
 
     final FormState form = _formKey.currentState;
 
@@ -203,16 +196,29 @@ class FormClientFull extends State<FormClient> {
       print('adress: ${client.adress}');
       print('========================================');
       print('Submitting to back end...');
-      //var contactService = new ContactService();
-      //contactService.createContact(newContact).then((value) =>
-      // print('New contact created for ${value.name}!', Colors.blue));
 
       ManageData.db
           .insertClient(client)
-          .then((value) => {print('new grivelerie create')});
-      //writeToFile(clientText.immatriculation, clientText);
-      //var clients = ManageData.db.getClients();
-      //clients.then((client) => client.forEach((f) => print(f.immatriculation)));
+          .then((value) => {
+            showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        content: Text('A new grivelerie is created with IM : ' +
+                            client.immatriculation +
+                            ' is created!'),
+                        actions: <Widget>[
+                          FlatButton(
+                            child: Text('OK'),
+                            onPressed: () {
+                                Navigator.pop(context);
+                            },
+                          ),
+                        ]
+                      );
+                    })
+            });
+      
     }
 
     /* void createFile(Map<String, Clients> content, Directory dir, String fileName) {
