@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shalomV1/detail_client.dart';
+import 'package:shalomV1/admin.dart';
+import 'package:shalomV1/About.dart';
 import 'package:shalomV1/model/clients.dart';
 import 'package:shalomV1/client_form.dart';
 import 'package:shalomV1/model/manageData.dart';
@@ -176,31 +178,37 @@ class _ListPageState extends State<ListPage> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
-            IconButton(
+            IconButton( // refesh page
               icon: Icon(Icons.home, color: Colors.white),
               onPressed: () {
                setState(() {
                 clients =ManageData.db.getClients(); 
                 clients.then((value) => {
-                    value.isNotEmpty?value.forEach((f)=>{dataClients.add(f)}) : print("Warning: Null value of client")
+                  value.isNotEmpty?value.forEach((f)=>{dataClients.add(f)}) : print("Warning: Null value of client")
                 });
                });
               },
             ),
-            IconButton(
+            IconButton( // add new grivelerie
               icon: Icon(Icons.person_add, color: Colors.white),
               onPressed: () {
                 Navigator.push(context,
                     MaterialPageRoute(builder: (context) => FormClient()));
               },
             ),
-            IconButton(
+            IconButton( // manage data
               icon: Icon(Icons.block, color: Colors.white),
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => Admin()));
+              },
             ),
             IconButton(
               icon: Icon(Icons.build, color: Colors.white),
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => About()));
+              },
             )
           ],
         ),
@@ -240,69 +248,3 @@ class _ListPageState extends State<ListPage> {
     );
   }
 }
-
-/*getClients() {
-  List<Clients> defaultValue = [
-    Clients(
-      immatriculation: "CP 405 RT",
-      name: "Patrick Tchepga",
-      adress: "23 Rue Jean Jaurès, 90000 Belfort",
-      montant: 20,
-      model: "C4 Citroen",
-      note: "Mes différentes remarques",
-      isSuspect: true,
-    ),
-    Clients(
-      immatriculation: "AS 782 AZ",
-      name: "Marcial Perien",
-      adress: " 4 avenue Leclerc, 90000 Belfort",
-      montant: 70,
-      model: "Mustande",
-      note: " Refaire mes premiers test",
-      isSuspect: false,
-    ),
-    Clients(
-      immatriculation: "PT 120 BR",
-      name: "Pauline Nicoles",
-      adress: "14 Rue des Anges, 90200 Valdoie",
-      montant: 20,
-      model: "Peugeot 200",
-      note: "Mes premières remarques",
-      isSuspect: false,
-    ),
-    Clients(
-      immatriculation: "CP 405 RT",
-      name: "Patricia Nganang",
-      adress: "56 boulevard de Prague , 90000 Belfort",
-      montant: 20,
-      note: "je fais plusieurs remarques sur ce véhicules",
-      model: "Peugeot 206",
-      isSuspect: true,
-    ),
-    Clients(
-      immatriculation: "KJ 412 ER",
-      name: "Ribertte Hilard",
-      adress: " 23 Rue Jean Jaurès, 90000 Belfort",
-      montant: 20,
-      model: " C4 Citroen",
-      note: " je fais un test pour voir si tout fonctionne",
-      isSuspect: false,
-    ),
-    Clients(
-      immatriculation: "CX 205 PR",
-      name: "Cedric Heintz",
-      adress: "14 avenue Foche, 90000 Belfort",
-      montant: 20,
-      model: "Mercedès",
-      note: "Rien à signaler",
-      isSuspect: false,
-    ),
-  ];
-  ManageData.db.insertClient(defaultValue[0]);
-  ManageData.db.insertClient(defaultValue[1]);
-  ManageData.db.insertClient(defaultValue[2]);
-
-  List<Clients> result = await ManageData.db.getClients();
-  print(result);
-  return result != null ? result : defaultValue;
-}*/

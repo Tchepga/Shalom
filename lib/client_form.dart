@@ -46,6 +46,7 @@ class FormClientFull extends State<FormClient> {
       home: new Scaffold(
         appBar: new AppBar(
           title: new Text('Ajouter une nouvelle grivelerie'),
+          backgroundColor: Color.fromRGBO(58, 66, 86, 1.0),
           leading: InkWell(
             onTap: () {
               Navigator.pop(context);
@@ -131,8 +132,8 @@ class FormClientFull extends State<FormClient> {
         ),
         new RaisedButton(
           onPressed: _sendToServer,
-          child: Text('Enregistrer'),
-          color: Colors.blue,
+          child: Text('Enregistrer', style: TextStyle(color:Colors.white)),
+          color:Color.fromRGBO(58, 66, 86, 1.0),
         )
       ],
     );
