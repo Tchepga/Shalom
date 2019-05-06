@@ -1,7 +1,6 @@
 import 'package:shalomV1/model/clients.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
-import 'package:path_provider/path_provider.dart';
 import 'package:shalomV1/model/manageData.dart';
 
 void main() => runApp(new FormClient());
@@ -16,7 +15,7 @@ class FormClientFull extends State<FormClient> {
   FormClientFull({Key key, this.client});
   final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
   List data;
-  bool _value1 = false;
+
   bool _value2 = false;
   String url = 'grivelerie.json';
   Directory dir;
@@ -25,7 +24,6 @@ class FormClientFull extends State<FormClient> {
   Map<String, String> fileContent;
 
   //we omitted the brackets '{}' and are using fat arrow '=>' instead, this is dart syntax
-  void _value1Changed(bool value) => setState(() => _value1 = value);
   void _value2Changed(bool value) => setState(() => _value2 = value);
 
   @override
@@ -114,7 +112,7 @@ class FormClientFull extends State<FormClient> {
         new TextFormField(
             decoration: new InputDecoration(hintText: 'Notes'),
             keyboardType: TextInputType.multiline,
-            validator: validateAdresse,
+            //validator: validateAdresse,
             onSaved: (String val) {
               client.note = val;
             }),
@@ -186,6 +184,7 @@ class FormClientFull extends State<FormClient> {
     if (!form.validate()) {
       print('Form is not valid!  Please review and correct.');
     } else {
+      client.isSuspect = _value2;
       form.save(); //This invokes each onSaved event
 
       print('Form save called, newContact is now up to date...');
@@ -195,6 +194,7 @@ class FormClientFull extends State<FormClient> {
       print('montant: ${client.montant}');
       print('note: ${client.note}');
       print('adress: ${client.adress}');
+       print('isSuspect: ${client.isSuspect}');
       print('========================================');
       print('Submitting to back end...');
 

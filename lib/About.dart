@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:io';
-import 'package:shalomV1/model/manageData.dart';
-
 void main() => runApp(new About());
 
 class About extends StatefulWidget {

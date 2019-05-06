@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'dart:io';
-import 'package:shalomV1/model/manageData.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() => runApp(new Admin());
 
@@ -8,15 +7,17 @@ class Admin extends StatefulWidget {
   @override
   AdminFull createState() => AdminFull();
 }
- class SessionAdmin {
-   String name;
-   String password;
- }
-class AdminFull extends State<Admin> {
-  
-  final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
-  SessionAdmin user= new SessionAdmin();
 
+class SessionAdmin {
+  String oldpass='';
+  String newpass='';
+}
+
+class AdminFull extends State<Admin> {
+  final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
+  String oldpass='';
+  String newpass='';
+  //AdminFull({Key key, this.user});
   @override
   initState() {
     // dir = new Directory("data");
@@ -52,37 +53,83 @@ class AdminFull extends State<Admin> {
     );
   }
 
+  _checkingCurrentPassword() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String savePass = prefs.getString('shalomPassword');
+    final FormState form = _formKey.currentState;
+
+    if (!form.validate()) {
+      print('Form is not valid!  Please review and correct.');
+    } else {
+      form.save();
+     if (savePass == null || savePass.isEmpty)
+        await prefs.setString('shalomPassword', "password");
+      if (savePass == oldpass) {
+        await prefs.setString('shalomPassword', newpass);
+        print('password :  $savePass .');
+        print(newpass);
+        showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                  content: Container(
+                      width: 130.0,
+                      height: 120.0,
+                      child: Text("votre mot de passe a été modifié")));
+          });
+      } else {
+        showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                  content: Container(
+                      width: 130.0,
+                      height: 120.0,
+                      child: Text("Ancien mot de passe incorrecte")));
+            });
+      }
+    }
+  }
+
   Widget formUI() {
-    
     return Column(
       children: <Widget>[
+        Text(' Changer le mot de passe administrateur'),
         TextFormField(
-          decoration: InputDecoration(hintText: 'user Admin'),
+          decoration: InputDecoration(hintText: 'Ancien mot de passe'),
           maxLength: 32,
-          validator: validationIM,
+          //validator: validationIM,
           onSaved: (String val) {
-            user.name = val;
+            oldpass = val;
           },
         ),
         new TextFormField(
-          decoration: new InputDecoration(hintText: 'Password'),
+          decoration: new InputDecoration(hintText: 'Nouveau mot de passe:'),
           maxLength: 32,
           // validator: validationIM,
           onSaved: (String val) {
-            user.password = val;
+            newpass = val;
           },
         ),
+        RaisedButton(
+            color: Color.fromRGBO(0, 66, 0, 0.5),
+            child: Text("valider", style: TextStyle(color: Colors.white)),
+            onPressed: _checkingCurrentPassword)
       ],
     );
   }
 
-  String validationIM(String value) {
+  validationIM(String value) async {
     String patttern = r'(^[a-zA-Z0-9 ]*$)';
-    RegExp regExp = new RegExp(patttern);
-    if (value.isEmpty) {
-      return "Immatriculation is Required";
-    } else if (!regExp.hasMatch(value)) {
-      return "Immatriculation must be a-z and A-Z";
+    //RegExp regExp = new RegExp(patttern);
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String oldPassword = prefs.getString('password');
+    print('oldp: $oldPassword .');
+
+    //await prefs.setInt('counter', counter);
+    if (value != oldPassword) {
+      return "Worn password!";
     }
     return null;
   }
@@ -98,17 +145,14 @@ class AdminFull extends State<Admin> {
     return null;
   }
 
-
   _sendToServer() {
-
-
     final FormState form = _formKey.currentState;
 
     if (!form.validate()) {
       print('Form is not valid!  Please review and correct.');
     } else {
       form.save(); //This invokes each onSaved event
-      
+
     }
   }
 }

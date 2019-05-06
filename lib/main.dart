@@ -35,7 +35,6 @@ class _ListPageState extends State<ListPage> {
   static Future<List<Clients>> clients;
   static List<Clients> dataClients= new List();
   static List<Clients> searchResult=new List();
-  static final TextEditingController _controller = new TextEditingController();
   static bool _isSearching=false;
   static String _searchText = "";
 
@@ -130,7 +129,7 @@ class _ListPageState extends State<ListPage> {
           elevation: 8.0,
           margin: new EdgeInsets.symmetric(horizontal: 10.0, vertical: 6.0),
           child: Container(
-            decoration: BoxDecoration(color: Color.fromRGBO(64, 75, 96, .9)),
+            decoration: client.isSuspect ? BoxDecoration(color: Color.fromRGBO(100, 75, 96, .9)):BoxDecoration(color: Color.fromRGBO(64, 75, 96, .9)),
             child: makeListTile(client),
           ),
         );

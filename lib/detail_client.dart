@@ -4,6 +4,7 @@ import 'package:shalomV1/model/manageData.dart';
 
 class DetailClient extends StatelessWidget {
   final Clients client;
+
   DetailClient({Key key, this.client}) : super(key: key);
   @override
   Widget build(BuildContext context) {
@@ -11,7 +12,6 @@ class DetailClient extends StatelessWidget {
       client.model == null ? 'XXXX' : client.model,
       style: TextStyle(color: Colors.white, fontSize: 10.0),
     );
-
     final montantClient = Container(
       padding: const EdgeInsets.all(7.0),
       margin: const EdgeInsets.all(7.0),
@@ -103,7 +103,6 @@ class DetailClient extends StatelessWidget {
         )
       ],
     );
-
     final adressText = Text(
       client.adress == null ? 'XXXX' : client.adress,
       style: TextStyle(fontSize: 18.0),
@@ -131,8 +130,8 @@ class DetailClient extends StatelessWidget {
       ),
     );
     final deleteButton = Container(
-        padding: EdgeInsets.symmetric(vertical: 16.0),
-        width: MediaQuery.of(context).size.width,
+        padding: EdgeInsets.symmetric(vertical: 1.0),
+        width: MediaQuery.of(context).size.width-160,
         child: RaisedButton(
           onPressed: () => {
                 showDialog(
@@ -140,12 +139,36 @@ class DetailClient extends StatelessWidget {
                     builder: (BuildContext context) {
                       return AlertDialog(
                         title: Text(
-                          "Confirmation of delete",
+                          "Delete confirmation",
                           style: TextStyle(fontSize: 21.0, color: Colors.red),
                         ),
-                        content: Text('Would you want to delete data of ' +
-                            client.immatriculation +
-                            ' ?'),
+                        content: Container(
+                          width: 130.0,
+                          height: 120.0,
+                          child:Center(
+                            child:Column(
+                              children: <Widget>[
+                                 Text('Enter password to confirm that "' +client.immatriculation +'" will be delete.'),
+                                 TextFormField(
+                                  decoration: InputDecoration(
+                                    hintText: 'Password',
+                                    fillColor: Colors.white,
+                                    border: new OutlineInputBorder(
+                                      borderRadius: new BorderRadius.circular(25.0),
+                                      borderSide: new BorderSide(
+                                      ),
+                                    ),
+                                    //fillColor: Colors.green
+                                  ),
+                                  maxLength: 32,
+                                  onSaved: (String val) {
+                                    passwordConfirm = val;
+                                  },
+                                ),
+                              ]
+                            )
+                          )
+                        ),  
                         actions: <Widget>[
                           FlatButton(
                             child: Text('Cancel'),
@@ -156,6 +179,7 @@ class DetailClient extends StatelessWidget {
                           FlatButton(
                             child: new Text("Accept"),
                             onPressed: () {
+                              
                               ManageData.db.deleteClient(client.immatriculation);
                               Navigator.pop(context);
                               Navigator.pop(context);
@@ -169,9 +193,19 @@ class DetailClient extends StatelessWidget {
           child: Text("Supprimer ce compte",
               style: TextStyle(color: Colors.white)),
         ));
-    final bottomContent = Container(
-      width: MediaQuery.of(context).size.width,
-      padding: EdgeInsets.all(40.0),
+
+    final modidyButton = Container(
+        padding: EdgeInsets.symmetric(vertical: 1.0),
+        width: MediaQuery.of(context).size.width-160,
+        child: RaisedButton(
+          onPressed: () => {
+               
+              },
+          color: Color.fromRGBO(0, 66, 0, 0.5),
+          child: Text("modifier ce compte",
+              style: TextStyle(color: Colors.white)),
+        ));
+    final bottomContent = Expanded(
       child: Center(
         child: Column(
           children: <Widget>[
@@ -179,6 +213,7 @@ class DetailClient extends StatelessWidget {
             adressText,
             montantClient,
             noteContent,
+            modidyButton,
             deleteButton
           ],
         ),
