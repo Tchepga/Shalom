@@ -22,14 +22,18 @@ class ManageData {
     String path = join(documentsDirectory.path, "shalom.db");
     return await openDatabase(path, version: 1, onOpen: (db) {},
         onCreate: (Database db, int version) async {
-      await db.execute("CREATE TABLE  if not exists Clients ("
+      await db.execute("CREATE TABLE if not exists Clients ("
           "immatriculation varchar(10) PRIMARY KEY,"
           "name,"
           "adress TEXT,"
           "model varchar(50),"
           "montant real,"
+          "othermontant1 real,"
+          "othermontant2 real,"
+          "othermontant3 real,"
           "note text,"
-          "isSuspect boolean"
+          "isSuspect boolean,"
+          "status boolean"
           ")");
     });
   }
@@ -67,8 +71,12 @@ class ManageData {
         model: maps[i]['model'],
         name: maps[i]['name'],
         montant: maps[i]['montant'],
+        othermontant1:maps[i]['othermontant1'],
+        othermontant2:maps[i]['othermontant2'],
+        othermontant3:maps[i]['othermontant3'],
         note: maps[i]['note'],
         isSuspect: maps[i]['isSuspect'] == 1 ? true : false,
+        status: maps[i]['status'] == 1 ? true : false
       );
     });
   }

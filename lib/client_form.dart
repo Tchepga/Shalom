@@ -183,18 +183,37 @@ class FormClientFull extends State<FormClient> {
 
     if (!form.validate()) {
       print('Form is not valid!  Please review and correct.');
+      showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                  content: Container(
+                      width: 130.0,
+                      height: 120.0,
+                      child: Text("Form is not valid!  Please review and correct. Veuillez contacter votre administrateur!")),
+                  actions: <Widget>[
+                    FlatButton(
+                      child: Text('OK'),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ]);
+            });
     } else {
       client.isSuspect = _value2;
+      client.status = false;
       form.save(); //This invokes each onSaved event
 
-      print('Form save called, newContact is now up to date...');
+      print('Form save called, newClient is created...');
       print('immatriculation: ${client.immatriculation}');
       print('model: ${client.model}');
       print('name: ${client.name}');
       print('montant: ${client.montant}');
       print('note: ${client.note}');
       print('adress: ${client.adress}');
-       print('isSuspect: ${client.isSuspect}');
+      print('isSuspect: ${client.isSuspect}');
+      print('status: ${client.status}');
       print('========================================');
       print('Submitting to back end...');
 
@@ -212,6 +231,7 @@ class FormClientFull extends State<FormClient> {
                           FlatButton(
                             child: Text('OK'),
                             onPressed: () {
+                                Navigator.pop(context);
                                 Navigator.pop(context);
                             },
                           ),

@@ -1,6 +1,7 @@
 import 'package:shalomV1/model/clients.dart';
 import 'package:flutter/material.dart';
 import 'package:shalomV1/model/manageData.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DetailClient extends StatelessWidget {
   final Clients client;
@@ -13,18 +14,98 @@ class DetailClient extends StatelessWidget {
       style: TextStyle(color: Colors.white, fontSize: 10.0),
     );
     final montantClient = Container(
-      padding: const EdgeInsets.all(7.0),
-      margin: const EdgeInsets.all(7.0),
-      decoration: new BoxDecoration(
-          border: new Border.all(color: Colors.black87),
-          borderRadius: BorderRadius.circular(5.0)),
-      child: new Text(
-        "Montant facture : " + client.montant.toString() == null
-            ? 'XXXXX'
-            : client.montant.toString() + "\€",
-        style: TextStyle(color: Colors.red),
-      ),
-    );
+        //padding: const EdgeInsets.all(7.0),
+        margin: const EdgeInsets.all(7.0),
+        child: Row(
+          children: <Widget>[
+            Container(
+              decoration: new BoxDecoration(
+                  border: new Border.all(color: Colors.black87),
+                  borderRadius: BorderRadius.circular(4.0)),
+              child: Text(
+              client.montant.toString() == null
+                  ? 'XXXXX'
+                  : "Principale : " + client.montant.toString() + "\€",
+              style: TextStyle(color: Colors.red),
+              )
+            ),
+            Container(
+              margin: EdgeInsets.only(left: 20),
+              decoration: new BoxDecoration(
+                  border: new Border.all(color: Colors.black87),
+                  borderRadius: BorderRadius.circular(4.0)),
+              child: Text(
+              client.montant.toString() == null
+                  ? 'XXXXX'
+                  : "  N°1 : " + client.othermontant1.toString() + "\€",
+              style: TextStyle(color: Colors.red),
+              )
+            ),
+            Container(
+              margin: EdgeInsets.only(left: 5),
+              decoration: new BoxDecoration(
+                  border: new Border.all(color: Colors.black87),
+                  borderRadius: BorderRadius.circular(4.0)),
+              child: Text(
+              client.montant.toString() == null
+                  ? 'XXXXX'
+                  : "  N°2 : " + client.othermontant2.toString() + "\€",
+              style: TextStyle(color: Colors.red),
+              )
+            ),
+            Container(
+              margin: EdgeInsets.only(left: 5),
+              decoration: new BoxDecoration(
+                  border: new Border.all(color: Colors.black87),
+                  borderRadius: BorderRadius.circular(4.0)),
+              child: Text(
+              client.montant.toString() == null
+                  ? 'XXXXX'
+                  : "  N°3 : " + client.othermontant3.toString() + "\€",
+              style: TextStyle(color: Colors.red),
+              )
+            )
+          ]
+        )
+      );
+
+    final totalMontant = Container(
+        padding: const EdgeInsets.all(7.0),
+        margin: const EdgeInsets.all(7.0),
+       /* decoration: new BoxDecoration(
+            border: new Border.all(color: Colors.black87),
+            borderRadius: BorderRadius.circular(5.0)),*/
+        child: Center(
+            child: Row(children: [
+          Text(
+            "Total : ",
+            style: TextStyle(color: Colors.black),
+          ),
+           Container(
+              margin: EdgeInsets.only(left: 5),
+              decoration: new BoxDecoration(
+                  color: Colors.orange,
+                  border: new Border.all(color: Colors.orange),
+                  borderRadius: BorderRadius.circular(4.0)),
+              child: Text( (client.montant + 
+                  client.othermontant1 +
+                    client.othermontant2 +
+                      client.othermontant3 ).toString() + "\€",
+            style: TextStyle(color: Colors.red),
+          )),
+          Container(
+              margin: EdgeInsets.only(left: 5),
+              child: FlatButton(
+                onPressed: () => {},
+                color: client.status? Colors.green:Colors.redAccent,
+                padding: EdgeInsets.all(10.0),
+                child: Row( // Replace with a Row for horizontal icon + text
+                  children: <Widget>[
+                    Text(client.status? "Status: Réglé": "Statut : Pas réglé"),
+                  ],
+                ),
+          ))
+        ])));
 
     final topContentText = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -129,66 +210,89 @@ class DetailClient extends StatelessWidget {
         ),
       ),
     );
+    //String passwordConfirm;
+
+    confirmDelete() async {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String savePass = prefs.getString('shalomPassword');
+      String passwordConfirm = "re";
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text(
+                "Delete confirmation",
+                style: TextStyle(fontSize: 21.0, color: Colors.red),
+              ),
+              content: Container(
+                  width: 130.0,
+                  height: 120.0,
+                  child: Center(
+                      child: Column(children: <Widget>[
+                    Text('Enter password to confirm that "' +
+                        client.immatriculation +
+                        '" will be delete.'),
+                    TextField(
+                      keyboardType: TextInputType.text,
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        hintText: 'Password',
+                        fillColor: Colors.white,
+                        border: new OutlineInputBorder(
+                          borderRadius: new BorderRadius.circular(25.0),
+                          borderSide: new BorderSide(),
+                        ),
+                        //fillColor: Colors.green
+                      ),
+                      maxLength: 32,
+                      onChanged: (String val) {
+                        passwordConfirm = val;
+                        //print(val);
+                      },
+                    ),
+                  ]))),
+              actions: <Widget>[
+                FlatButton(
+                  child: Text('Cancel'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+                FlatButton(
+                  child: new Text("Accept"),
+                  onPressed: () {
+                    if (passwordConfirm == savePass) {
+                      ManageData.db.deleteClient(client.immatriculation);
+                      Navigator.pop(context);
+                      Navigator.pop(context);
+                      print("Supp ok");
+                    } else {
+                      print(savePass);
+                      print(passwordConfirm);
+                      showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                                title: Text(
+                                  "Delete confirmation",
+                                  style: TextStyle(
+                                      fontSize: 21.0, color: Colors.red),
+                                ),
+                                content: Text("Wrong password!"));
+                          });
+                    }
+                  },
+                )
+              ],
+            );
+          });
+    }
+
     final deleteButton = Container(
         padding: EdgeInsets.symmetric(vertical: 1.0),
-        width: MediaQuery.of(context).size.width-160,
+        width: MediaQuery.of(context).size.width - 160,
         child: RaisedButton(
-          onPressed: () => {
-                showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: Text(
-                          "Delete confirmation",
-                          style: TextStyle(fontSize: 21.0, color: Colors.red),
-                        ),
-                        content: Container(
-                          width: 130.0,
-                          height: 120.0,
-                          child:Center(
-                            child:Column(
-                              children: <Widget>[
-                                 Text('Enter password to confirm that "' +client.immatriculation +'" will be delete.'),
-                                 TextFormField(
-                                  decoration: InputDecoration(
-                                    hintText: 'Password',
-                                    fillColor: Colors.white,
-                                    border: new OutlineInputBorder(
-                                      borderRadius: new BorderRadius.circular(25.0),
-                                      borderSide: new BorderSide(
-                                      ),
-                                    ),
-                                    //fillColor: Colors.green
-                                  ),
-                                  maxLength: 32,
-                                  onSaved: (String val) {
-                                    passwordConfirm = val;
-                                  },
-                                ),
-                              ]
-                            )
-                          )
-                        ),  
-                        actions: <Widget>[
-                          FlatButton(
-                            child: Text('Cancel'),
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                          ),
-                          FlatButton(
-                            child: new Text("Accept"),
-                            onPressed: () {
-                              
-                              ManageData.db.deleteClient(client.immatriculation);
-                              Navigator.pop(context);
-                              Navigator.pop(context);
-                            },
-                          )
-                        ],
-                      );
-                    })
-              },
+          onPressed: confirmDelete,
           color: Color.fromRGBO(0, 66, 0, 0.5),
           child: Text("Supprimer ce compte",
               style: TextStyle(color: Colors.white)),
@@ -196,14 +300,12 @@ class DetailClient extends StatelessWidget {
 
     final modidyButton = Container(
         padding: EdgeInsets.symmetric(vertical: 1.0),
-        width: MediaQuery.of(context).size.width-160,
+        width: MediaQuery.of(context).size.width - 160,
         child: RaisedButton(
-          onPressed: () => {
-               
-              },
+          onPressed: () => {},
           color: Color.fromRGBO(0, 66, 0, 0.5),
-          child: Text("modifier ce compte",
-              style: TextStyle(color: Colors.white)),
+          child:
+              Text("modifier ce compte", style: TextStyle(color: Colors.white)),
         ));
     final bottomContent = Expanded(
       child: Center(
@@ -212,6 +314,7 @@ class DetailClient extends StatelessWidget {
             nameClient,
             adressText,
             montantClient,
+            totalMontant,
             noteContent,
             modidyButton,
             deleteButton

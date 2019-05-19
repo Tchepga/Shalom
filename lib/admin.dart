@@ -9,14 +9,14 @@ class Admin extends StatefulWidget {
 }
 
 class SessionAdmin {
-  String oldpass='';
-  String newpass='';
+  String oldpass = '';
+  String newpass = '';
 }
 
 class AdminFull extends State<Admin> {
   final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
-  String oldpass='';
-  String newpass='';
+  String oldpass = '';
+  String newpass = '';
   //AdminFull({Key key, this.user});
   @override
   initState() {
@@ -62,7 +62,7 @@ class AdminFull extends State<Admin> {
       print('Form is not valid!  Please review and correct.');
     } else {
       form.save();
-     if (savePass == null || savePass.isEmpty)
+      if (savePass == null || savePass.isEmpty)
         await prefs.setString('shalomPassword', "password");
       if (savePass == oldpass) {
         await prefs.setString('shalomPassword', newpass);
@@ -75,8 +75,16 @@ class AdminFull extends State<Admin> {
                   content: Container(
                       width: 130.0,
                       height: 120.0,
-                      child: Text("votre mot de passe a été modifié")));
-          });
+                      child: Text("votre mot de passe a été modifié")),
+                  actions: <Widget>[
+                    FlatButton(
+                      child: Text('OK'),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ]);
+            });
       } else {
         showDialog(
             context: context,
@@ -85,7 +93,15 @@ class AdminFull extends State<Admin> {
                   content: Container(
                       width: 130.0,
                       height: 120.0,
-                      child: Text("Ancien mot de passe incorrecte")));
+                      child: Text("Ancien mot de passe incorrecte")),
+                  actions: <Widget>[
+                    FlatButton(
+                      child: Text('OK'),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ]);
             });
       }
     }
