@@ -183,6 +183,13 @@ packages:
       url: "https://github.com/AppleEducate/flutter_cupertino_settings"
     source: git
     version: "0.1.0"
+  flutter_email_sender:
+    dependency: "direct dev"
+    description:
+      name: flutter_email_sender
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.2"
   flutter_masked_text:
     dependency: transitive
     description:

@@ -1,5 +1,12 @@
-
+import 'dart:io';
+import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:shalomV1/model/clients.dart';
+import 'package:shalomV1/model/manageData.dart';
+
+import 'main.dart';
 
 void main() => runApp(new About());
 
@@ -30,6 +37,100 @@ class ListPage extends StatefulWidget {
 class _ListPageState extends State<ListPage> {
   Icon iconne = new Icon(Icons.backspace);
   String version = "beta0.5";
+
+  @override
+  initState() {
+    //  dir = new Directory("data");
+  }
+  /*void createFile(Map<String, Clients> content, Directory dir, String fileName) {
+    print("Creating file!");
+    print(dir.path);
+    File file = new File(dir.path + "/" + fileName);
+    file.createSync();
+    fileExists = true;
+    file.writeAsStringSync(jsonEncode(content));
+  }*/
+
+  /*void writeToFile(String key, Clients value) {
+    print("Writing to file!");
+    Map<String, Clients> content = {key: value};
+    if (fileExists) {
+      print("File exists");
+      Map<String, Clients> jsonFileContent = json.decode(jsonFile.readAsStringSync());
+      jsonFileContent.addAll(content);
+      jsonFile.writeAsStringSync(jsonEncode(jsonFileContent));
+    } else {
+      print("File does not exist!");
+      createFile(content, dir, url);
+    }
+    this.setState(() => fileContent = jsonDecode(jsonFile.readAsStringSync()));
+    print(fileContent);
+  }*/
+  Future<String> get _localPath async {
+    final directory = await getApplicationDocumentsDirectory();
+    return directory.path;
+  }
+
+  Future<String> get _localFile async {
+    return await rootBundle.loadString('assets/Grivelerie.csv');
+  }
+
+  Future<File> get _createFile async {
+
+   final path = await _localPath;
+   print(path);
+  return File('$path/Grivelerie.csv');
+  }
+
+  Future<File> writeData(String data) async {
+    
+    final file = await _createFile;
+    // Write the file
+    return file.writeAsString('$data');
+  }
+
+  Future<void> testData() async{
+    try {
+      final file = await _createFile;
+
+      // Read the file
+      String contents = await file.readAsString();
+      print(contents);
+      final path = await _localPath;
+
+      final Email email = Email(
+        body: 'Test extraction data grivelerie',
+        subject: ' Data grivelerie',
+        recipients: ['azera9730gmail.com'],
+        //cc: ['cc@example.com'],
+        //bcc: ['bcc@example.com'],
+        attachmentPath: '$path//Grivelerie.csv',
+      );
+
+      await FlutterEmailSender.send(email);
+      //return contents;
+    } catch (e) {
+      // If encountering an error, return 0
+      print("reading problem");
+      //return e.toString();
+    }
+  }
+  
+  Future<String> readData() async {
+    try {
+      final file = await _localFile;
+
+      // Read the file
+      String contents = await _localFile;
+
+      return contents;
+    } catch (e) {
+      // If encountering an error, return 0
+      print("reading problem");
+      return e.toString();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final makeBody = Container(
@@ -53,7 +154,35 @@ class _ListPageState extends State<ListPage> {
             children: <Widget>[
               RaisedButton(
                 color: Colors.orange,
-                onPressed: () {},
+                onPressed: ()  {
+                  //print(_localPath);
+                  String dataTreat = "";
+                  print("Operation Extraction de données de la base.");
+                  ManageData.db.getClients().then((values) =>{
+                    values.forEach((f) => {
+                      //immatriculation-montant-note-model-status-name-adress-other1....
+                      dataTreat += f.immatriculation +';'+ 
+                        f.montant.toString()+';'+
+                        f.note+';'+
+                        f.model+';'+
+                        f.status.toString()+';'+
+                        f.name+';'+
+                        f.isSuspect.toString()+';'+
+                        f.adress+';'+
+                        f.othermontant1.toString()+';'+
+                        f.othermontant2.toString()+';'+
+                        f.othermontant3.toString()+';'+'\n',
+                       
+                    }),
+                   // print(dataTreat.substring(dataTreat.length - 40)),
+                    writeData(dataTreat).then((f)=>{
+                      print("Data have been extracted!"),
+                      //testData()
+                      
+                      }),
+
+                  });
+                },
                 child:
                     const Text('export data', style: TextStyle(fontSize: 20)),
               ),
@@ -62,12 +191,108 @@ class _ListPageState extends State<ListPage> {
               ),
               RaisedButton(
                 color: Colors.greenAccent,
-                onPressed: () {},
+                onPressed: () {
+                  //String dataRaw="" ;
+                  List<String> organizeData;
+                  List<String> lineOfData;
+                  Clients tempClient;
+                  readData().then((value) => {
+                        organizeData = value.split("\n"),
+                        //print(organizeData),
+                        organizeData.forEach((f) => {
+                              if (f.isNotEmpty)
+                                {
+                                  lineOfData = f.split(";"),
+                                  f = f.replaceAll(new RegExp(';;'), ';')
+                                },
+                              print(lineOfData),
+                              lineOfData[1] =
+                                  lineOfData[1].replaceAll(',', '.'),
+                              lineOfData[1] = lineOfData[1].trimLeft(),
+
+                              if (lineOfData[1].contains('+'))
+                                print(
+                                    " Data contains + characters! Wrong data"),
+                              if (lineOfData[1].isEmpty)
+                                lineOfData[1] = '0',
+
+                              //print(lineOfData[1])
+                              //print(lineOfData[1]),
+                              //print(double.parse(lineOfData[1]))
+
+                              tempClient = new Clients(
+                                  adress: 'XXXX',
+                                  immatriculation: lineOfData[0],
+                                  isSuspect: false,
+                                  model: lineOfData[3],
+                                  montant: double.parse(lineOfData[1]),
+                                  name: lineOfData[5],
+                                  note: lineOfData[2],
+                                  status: lineOfData[4].contains('1')),
+
+                              ManageData.db
+                                  .insertClient(tempClient)
+                                  .then((f) => {
+                                        showDialog(
+                                            context: context,
+                                            builder: (BuildContext context) {
+                                              return AlertDialog(
+                                                  title: Text(
+                                                    "Import confirmation",
+                                                    style: TextStyle(
+                                                        fontSize: 21.0,
+                                                        color: Colors.red),
+                                                  ),
+                                                  content: Text(
+                                                      "All data have been imported from the csv file!"),
+                                                  actions: <Widget>[
+                                                    FlatButton(
+                                                      child: Text('Cancel'),
+                                                      onPressed: () {
+                                                        Navigator.pop(context);
+                                                        Navigator.push(
+                                                            context,
+                                                            MaterialPageRoute(
+                                                                builder:
+                                                                    (context) =>
+                                                                        MyApp()));
+                                                      },
+                                                    ),
+                                                  ]);
+                                            })
+                                      })
+                                  .catchError((f) => {print(f)})
+                            }),
+                      });
+                },
                 child:
                     const Text('import data', style: TextStyle(fontSize: 20)),
               ),
             ],
           ),
+          Container(
+              margin: const EdgeInsets.only(top: 20, bottom: 40),
+              child: Text(
+                "Cette application est une version d'essaie destiné à Total Access SHALOM  pour"
+                " la gestion des grivéleries clients. Elle consiste au CRUD des clients concernés, à l'extraction et "
+                "de l'importation des données clients. Une partie administration est aussi mis en place.",
+                style: TextStyle(
+                  fontSize: 20,
+                  color: Colors.white,
+                ),
+              )),
+          Center(
+            child: RaisedButton(
+              color: Colors.white,
+              onPressed: () {
+                Navigator.pop(context);
+                Navigator.push(
+                    context, MaterialPageRoute(builder: (context) => MyApp()));
+              },
+              child: const Text('Revenir au menu principal',
+                  style: TextStyle(fontSize: 20)),
+            ),
+          )
         ],
       ),
     );
@@ -77,7 +302,7 @@ class _ListPageState extends State<ListPage> {
       child: BottomAppBar(
           color: Color.fromRGBO(58, 66, 86, 1.0),
           child: Center(
-              child: Row(children: <Widget>[
+              child: Column(children: <Widget>[
             Text(
               '@author: ptchepga - dev' + version,
               style: TextStyle(
@@ -87,16 +312,16 @@ class _ListPageState extends State<ListPage> {
             Text("Tous droits réversés - Shalom Total"),
           ]))),
     );
-    final topAppBar = new AppBar(
-      title: new Text(' A-propos'),
-      backgroundColor: Color.fromRGBO(58, 66, 86, 1.0),
-      leading: InkWell(
-        onTap: () {
-          Navigator.of(context).pop();
-        },
-        child: Icon(Icons.arrow_back, color: Colors.white),
-      ),
-    );
+    // final topAppBar = new AppBar(
+    //   title: new Text(' A-propos'),
+    //   backgroundColor: Color.fromRGBO(58, 66, 86, 1.0),
+    //   leading: InkWell(
+    //     onTap: () {
+    //       Navigator.of(context).pop();
+    //     },
+    //     child: Icon(Icons.arrow_back, color: Colors.white),
+    //   ),
+    // );
 
     return Scaffold(
       backgroundColor: Color.fromRGBO(58, 66, 86, 1.0),
