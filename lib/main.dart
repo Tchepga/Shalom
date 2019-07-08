@@ -13,7 +13,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Grivelerie',
       theme: new ThemeData(
           primaryColor: Color.fromRGBO(58, 66, 86, 1.0), fontFamily: 'Raleway'),
       home: new ListPage(title: 'Grivelerie - SHALOM'),
@@ -124,12 +124,25 @@ class _ListPageState extends State<ListPage> {
                     builder: (context) => DetailClient(client: client)));
           },
         );
-
+    BoxDecoration getWarningColor(Clients client)
+    {
+       if( client.isSuspect && !client.status )
+         return BoxDecoration(color: Color.fromRGBO(100, 75, 96, .9));
+       else if (client.isSuspect && client.status)
+              return BoxDecoration(color: Color.fromRGBO(239, 137, 63, .9));
+            else if(!client.isSuspect && !client.status)
+                   return BoxDecoration(color: Color.fromRGBO(239, 191, 63, .9));
+                  else
+                    return BoxDecoration(color: Color.fromRGBO(91, 219, 120, .9));
+        
+          
+            
+    }
     Card makeCard(Clients client) => Card(
           elevation: 8.0,
           margin: new EdgeInsets.symmetric(horizontal: 10.0, vertical: 6.0),
           child: Container(
-            decoration: client.isSuspect ? BoxDecoration(color: Color.fromRGBO(100, 75, 96, .9)):BoxDecoration(color: Color.fromRGBO(64, 75, 96, .9)),
+            decoration: getWarningColor(client),
             child: makeListTile(client),
           ),
         );

@@ -61,7 +61,7 @@ class ManageData {
     //db.execute("drop table Clients");
 
     // Query the table for All The Clients.
-    final List<Map<String, dynamic>> maps = await db.query('Clients');
+    final List<Map<String, dynamic>> maps = await db.query('Clients',orderBy: 'immatriculation');
 
     // Convert the List<Map<String, dynamic> into a List<Clients>.
     return List.generate(maps.length, (i) {
@@ -109,5 +109,4 @@ Future<void> deleteClient(String immatriculation) async {
     whereArgs: [immatriculation],
   );
 }
-
 }

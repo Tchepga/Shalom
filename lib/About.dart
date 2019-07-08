@@ -1,10 +1,13 @@
 import 'dart:io';
-import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shalomV1/model/clients.dart';
 import 'package:shalomV1/model/manageData.dart';
+import 'package:flutter_email_sender/flutter_email_sender.dart';
+import 'package:flutter_mailer/flutter_mailer.dart';
+import 'package:mailer/mailer.dart';
+import 'package:mailer/smtp_server.dart';
 
 import 'main.dart';
 
@@ -71,6 +74,11 @@ class _ListPageState extends State<ListPage> {
     return directory.path;
   }
 
+  Future<String> get _tempPath async {
+    final directory = await getTemporaryDirectory();
+    return directory.path;
+  }
+
   Future<String> get _localFile async {
     return await rootBundle.loadString('assets/Grivelerie.csv');
   }
@@ -82,36 +90,55 @@ class _ListPageState extends State<ListPage> {
   return File('$path/Grivelerie.csv');
   }
 
+  Future<File> get _dataToSend async {
+
+   final path = await _tempPath;
+   print(path);
+  return File('$path/Grivelerie.csv');
+  }
+
   Future<File> writeData(String data) async {
     
-    final file = await _createFile;
+    final file = await _dataToSend;
     // Write the file
     return file.writeAsString('$data');
   }
 
-  Future<void> testData() async{
+  Future<void> sendEmail() async{
+    
+     final file = await _dataToSend;
+    
+
     try {
-      final file = await _createFile;
 
       // Read the file
       String contents = await file.readAsString();
       print(contents);
-      final path = await _localPath;
 
+      
+  
+
+     final attached =file.path;
+    // getExternalStorageDirectory().then((v)=>print(v.list().first));
+     //getApplicationDocumentsDirectory().then((value)=>print(value.absolute));
       final Email email = Email(
         body: 'Test extraction data grivelerie',
         subject: ' Data grivelerie',
-        recipients: ['azera9730gmail.com'],
+        recipients: ['tchepgapatrick@yahoo.fr'],
         //cc: ['cc@example.com'],
         //bcc: ['bcc@example.com'],
-        attachmentPath: '$path//Grivelerie.csv',
+         attachmentPath:     attached,
       );
+    /* getApplicationDocumentsDirectory().then((v)=>{
+       v.
+     });*/
+     await FlutterEmailSender.send(email);
 
-      await FlutterEmailSender.send(email);
+
       //return contents;
     } catch (e) {
       // If encountering an error, return 0
-      print("reading problem");
+      print(e.toString());
       //return e.toString();
     }
   }
@@ -177,7 +204,7 @@ class _ListPageState extends State<ListPage> {
                    // print(dataTreat.substring(dataTreat.length - 40)),
                     writeData(dataTreat).then((f)=>{
                       print("Data have been extracted!"),
-                      //testData()
+                      sendEmail()
                       
                       }),
 

@@ -2,6 +2,7 @@ import 'package:shalomV1/model/clients.dart';
 import 'package:flutter/material.dart';
 import 'package:shalomV1/model/manageData.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shalomV1/modify_client.dart';
 
 class DetailClient extends StatelessWidget {
   final Clients client;
@@ -215,6 +216,9 @@ class DetailClient extends StatelessWidget {
     confirmDelete() async {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String savePass = prefs.getString('shalomPassword');
+      
+      if(savePass==null) savePass="Shalom";
+
       String passwordConfirm = "re";
       showDialog(
           context: context,
@@ -297,12 +301,18 @@ class DetailClient extends StatelessWidget {
           child: Text("Supprimer ce compte",
               style: TextStyle(color: Colors.white)),
         ));
-
+    //final modClient = this.client;
     final modidyButton = Container(
         padding: EdgeInsets.symmetric(vertical: 1.0),
         width: MediaQuery.of(context).size.width - 160,
         child: RaisedButton(
-          onPressed: () => {},
+          onPressed: () => { 
+           
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => ModFormClient( client: this.client)))
+          },
           color: Color.fromRGBO(0, 66, 0, 0.5),
           child:
               Text("modifier ce compte", style: TextStyle(color: Colors.white)),

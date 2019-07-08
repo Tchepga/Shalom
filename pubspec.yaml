@@ -9,6 +9,10 @@ dependencies:
   sqflite: ^1.1.0
   card_settings: ^1.4.1
   shared_preferences: ^0.5.2
+  flutter_email_sender: ^2.0.3
+  flutter_mailer: ^0.4.1+1
+  smtp: ^1.0.0+1
+  mailer: ^2.0.2   # add this line
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.2
@@ -18,7 +22,6 @@ dev_dependencies:
     sdk: flutter
   build_runner: ^1.0.0
   json_serializable: ^2.0.0
-  flutter_email_sender: ^2.0.2
 
 
 # For information on the generic Dart part of this file, see the

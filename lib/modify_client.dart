@@ -3,35 +3,37 @@ import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:shalomV1/model/manageData.dart';
 
-void main() => runApp(new FormClient());
+void main() => runApp(new ModFormClient());
 
-class FormClient extends StatefulWidget {
+class ModFormClient extends StatefulWidget {
+
+   final Clients client;
+  ModFormClient({Key key, this.client}): super(key: key);
+  
   @override
-  FormClientFull createState() => FormClientFull();
+  ModFormClientFull createState() => ModFormClientFull();
 }
 
-class FormClientFull extends State<FormClient> {
-  Clients client = new Clients();
-  FormClientFull({Key key, this.client});
+class ModFormClientFull extends State<ModFormClient> {
+ 
   final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
   List data;
 
-  bool _value2 = false;
+  bool _valueSuspect = false;
+  bool _valueStatus = false;
   String url = 'grivelerie.json';
   Directory dir;
   File jsonFile;
   bool fileExists = false;
   Map<String, String> fileContent;
-
+  Clients clientGet;
+  int _groupValue =0;
+  int _groupValue1 =0; 
   //we omitted the brackets '{}' and are using fat arrow '=>' instead, this is dart syntax
-  void _value2Changed(bool value) => setState(() => _value2 = value);
+//  void _value2Changed(bool value) => setState(() =>{ _value2 = value});
+  //void _value1Changed(bool value) => setState(() =>{ _value3 = value});
 
-  @override
-  initState() {
-    // dir = new Directory("data");
-    //final path = _localPath;
-    // print(path);
-  }
+  
   /*Future<String> get _localPath async {
     final directory = await getApplicationDocumentsDirectory();
 
@@ -43,7 +45,7 @@ class FormClientFull extends State<FormClient> {
     return MaterialApp(
       home: new Scaffold(
         appBar: new AppBar(
-          title: new Text('Ajouter une nouvelle grivelerie'),
+          title: new Text('Modifier les informations'),
           backgroundColor: Color.fromRGBO(58, 66, 86, 1.0),
           leading: InkWell(
             onTap: () {
@@ -65,70 +67,176 @@ class FormClientFull extends State<FormClient> {
       ),
     );
   }
-
+  void _valueChange(int value) {
+    setState(() {
+       _groupValue = value;
+       
+      switch (value) {
+        case 0:
+          _valueSuspect = true;
+          break;
+        case 1:
+          _valueSuspect = false;
+          break;
+      }
+    }) ;
+  }
+  void _valueChange1(int value) {
+    setState(() {
+       _groupValue1 = value;
+       
+      switch (_groupValue1) {
+        case 0:
+          _valueStatus = false;
+          break;
+        case 1:
+          _valueStatus = true;
+          break;
+      }
+    }) ;
+  }
+  
   Widget formUI() {
-    client = new Clients();
+    clientGet = widget.client;
     return Column(
       children: <Widget>[
+        
         TextFormField(
           decoration: InputDecoration(hintText: 'Immatriculation'),
           maxLength: 32,
+          initialValue: clientGet.immatriculation,
           validator: validationIM,
           onSaved: (String val) {
-            client.immatriculation = val;
+            clientGet.immatriculation = val;
           },
         ),
         new TextFormField(
           decoration: new InputDecoration(hintText: 'Modèle voiture'),
+          initialValue: clientGet.model,
           maxLength: 32,
           // validator: validationIM,
           onSaved: (String val) {
-            client.model = val;
+            clientGet.model = val;
           },
         ),
-        new TextFormField(
-            decoration: new InputDecoration(hintText: 'Montant'),
-            keyboardType: TextInputType.numberWithOptions(decimal: true),
-            maxLength: 5,
-            //validator: validateMontant,
-            onSaved: (val) {
 
-              client.montant = double.parse(val)+0.0;
-            }),
         new TextFormField(
             decoration: new InputDecoration(hintText: 'Nom'),
             maxLength: 32,
+            initialValue: clientGet.name,
             validator: validateName,
             onSaved: (String val) {
-              client.name = val;
+              clientGet.name = val;
             }),
         new TextFormField(
             decoration: new InputDecoration(hintText: 'Adresse'),
+            initialValue: clientGet.adress,
             keyboardType: TextInputType.text,
             maxLength: 50,
             validator: validateAdresse,
             onSaved: (String val) {
-              client.adress = val;
+              clientGet.adress = val;
             }),
         new TextFormField(
             decoration: new InputDecoration(hintText: 'Notes'),
+            initialValue: clientGet.note ,
             keyboardType: TextInputType.multiline,
             //validator: validateAdresse,
             onSaved: (String val) {
-              client.note = val;
+              clientGet.note = val;
             }),
-        new CheckboxListTile(
-          value: _value2,
-          onChanged: _value2Changed,
-          title: new Text('Signaler comme suspect',
-              style: TextStyle(color: Colors.red)),
-          controlAffinity: ListTileControlAffinity.leading,
-          activeColor: Colors.red,
-        ),
-        new SizedBox(
-          height: 15.0,
-          width: 50.0,
-        ),
+            new Container(
+              padding: EdgeInsets.all(8.0),
+              child: new  Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  new Radio(
+                    value: 0,
+                    groupValue: _groupValue,
+                    onChanged: _valueChange,
+                  ),
+                  new Text('Suspect'),
+                  new Radio(
+                    value: 1,
+                    groupValue: _groupValue,
+                    onChanged: _valueChange,
+                  ),
+                   new Text('Non Suspect'),
+                ]
+              ),
+            ),
+         new Divider(),
+        new TextFormField(
+            decoration: new InputDecoration(hintText: 'Montant N°1'),
+            keyboardType: TextInputType.number,
+            initialValue: clientGet.montant.toString(),
+            maxLength: 5,
+            //validator: validateMontant,
+            onSaved: (val) {
+              clientGet.montant = double.parse(val);
+            }),
+        new TextFormField(
+            decoration: new InputDecoration(hintText: 'Montant  N°1 '),
+            keyboardType: TextInputType.number,
+            initialValue: clientGet.othermontant1.toString(),
+            maxLength: 5,
+            //validator: validateMontant,
+            onSaved: (val) {
+              clientGet.othermontant1 = double.parse(val);
+            }),
+        new TextFormField(
+            decoration: new InputDecoration(hintText: 'Montant N°2'),
+            keyboardType: TextInputType.number,
+            initialValue: clientGet.othermontant2.toString(),
+            maxLength: 5,
+            //validator: validateMontant,
+            onSaved: (val) {
+              clientGet.othermontant2 = double.parse(val);
+            }),
+        new TextFormField(
+            decoration: new InputDecoration(hintText: 'Montant  N°3'),
+            keyboardType: TextInputType.number,
+            initialValue: clientGet.othermontant3.toString(),
+            maxLength: 5,
+            //validator: validateMontant,
+            onSaved: (val) {
+              clientGet.othermontant3 = double.parse(val);
+            }),
+        
+        new Divider(),
+        
+        new Row(
+          children: <Widget>[
+              Container(
+                decoration: new BoxDecoration(
+                border: new Border.all(color: Colors.black87),
+                borderRadius: BorderRadius.circular(4.0)),
+                child: Text(
+                  clientGet.montant.toString() == null
+                      ? 'XXXXX'
+                      : "Total : " + (clientGet.montant + 
+                                        clientGet.othermontant1+
+                                          clientGet.othermontant2 +
+                                            clientGet.othermontant3 ).toString() + "\€",
+                  style: TextStyle(color: Colors.red),
+                )
+              ),
+              
+              new Radio(
+                value: 0,
+                groupValue: _groupValue1,
+                onChanged: _valueChange1,
+              ),
+              new Text('Non Réglée'),
+              new Radio(
+                value: 1,
+                groupValue: _groupValue1,
+                onChanged: _valueChange1,
+              ),
+              new Text('Réglée'),
+                    
+                    ]
+            ),
         new RaisedButton(
           onPressed: _sendToServer,
           child: Text('Enregistrer', style: TextStyle(color:Colors.white)),
@@ -202,32 +310,32 @@ class FormClientFull extends State<FormClient> {
                   ]);
             });
     } else {
-      client.isSuspect = _value2;
-      client.status = false;
+      clientGet.isSuspect = _valueSuspect;
+      clientGet.status = _valueStatus;
       form.save(); //This invokes each onSaved event
 
       print('Form save called, newClient is created...');
-      print('immatriculation: ${client.immatriculation}');
-      print('model: ${client.model}');
-      print('name: ${client.name}');
-      print('montant: ${client.montant}');
-      print('note: ${client.note}');
-      print('adress: ${client.adress}');
-      print('isSuspect: ${client.isSuspect}');
-      print('status: ${client.status}');
+      print('immatriculation: ${clientGet.immatriculation}');
+      print('model: ${clientGet.model}');
+      print('name: ${clientGet.name}');
+      print('montant: ${clientGet.montant}');
+      print('note: ${clientGet.note}');
+      print('adress: ${clientGet.adress}');
+      print('isSuspect: ${clientGet.isSuspect}');
+      print('status: ${clientGet.status}');
       print('========================================');
       print('Submitting to back end...');
 
       ManageData.db
-          .insertClient(client)
+          .updateClient(clientGet)
           .then((value) => {
             showDialog(
                     context: context,
                     builder: (BuildContext context) {
                       return AlertDialog(
-                        content: Text('A new grivelerie is created with IM : ' +
-                            client.immatriculation +
-                            ' is created!'),
+                        content: Text('Update have been made on ' +
+                            clientGet.immatriculation +
+                            ' Client!'),
                         actions: <Widget>[
                           FlatButton(
                             child: Text('OK'),
